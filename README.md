@@ -1,4 +1,4 @@
-# Este notebook se propões à fazer um modelo de detecção de exoplanetas com os dados obtidos da missão Kepler e do arquivo de exoplanetas da NASA.
+# Este notebook se propõe à fazer um modelo de detecção de exoplanetas com os dados obtidos da missão Kepler e do arquivo de exoplanetas da NASA.
 
 🛰️ Dados coletados por:
 
