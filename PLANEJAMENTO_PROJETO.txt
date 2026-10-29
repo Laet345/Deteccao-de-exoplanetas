@@ -1,0 +1,242 @@
+================================================================================
+  PROJETO FINAL - SME0828: INTRODUÇÃO À CIÊNCIA DE DADOS (ICMC/USP)
+  PROF. FRANCISCO RODRIGUES
+  TEMA: CLASSIFICAÇÃO DIAGNÓSTICA DE CÂNCER DE MAMA (DATASET WDBC)
+================================================================================
+
+[AVISO IMPORTANTE SOBRE O GRUPO]
+O enunciado oficial da disciplina estipula "No máximo 3 pessoas (pode ser menos)".
+Como vocês estão organizados em 5 integrantes, certifiquem-se de confirmar com o 
+professor ou monitor da disciplina a autorização para esse formato de equipe, ou 
+se será necessário submeter em grupos menores interligados.
+
+--------------------------------------------------------------------------------
+1. VISÃO GERAL DO PROJETO E DOS DADOS
+--------------------------------------------------------------------------------
+• Base de Dados: Wisconsin Diagnostic Breast Cancer (WDBC)
+  - Arquivos: data/raw/wdbc.data e data/raw/wdbc.names
+  - Amostras: 569 pacientes
+  - Atributos: 32 colunas no total:
+      1) ID do paciente (identificador único, não preditivo)
+      2) Diagnóstico (Target: 'M' = Maligno [212], 'B' = Benigno [357])
+      3 a 32) 30 características numéricas contínuas extraídas de imagens
+              digitalizadas de punção aspirativa por agulha fina (FNA).
+              Representam média (mean), erro padrão (se) e pior valor (worst)
+              de 10 propriedades geométricas dos núcleos celulares:
+              - radius, texture, perimeter, area, smoothness, compactness,
+                concavity, concave points, symmetry, fractal dimension.
+  - Dados faltantes: Nenhum (base completa, sem NaNs).
+
+• Pergunta Fundamental / Hipótese Científica:
+  "É possível predizer com alta confiabilidade se uma lesão mamária é maligna 
+   ou benigna a partir das características morfométricas celulares, minimizando 
+   ao máximo os falsos negativos (diagnósticos de falso benigno)?"
+
+• Desafios Científicos Relevantes:
+  - Multicolinearidade acentuada (ex.: raio, perímetro e área são altamente correlacionados).
+  - Ligeiro desbalanceamento de classes (~62,7% Benigno vs ~37,3% Maligno).
+  - Escalas e grandezas muito distintas entre atributos (ex.: area ~ 1000 vs smoothness ~ 0.1).
+  - Criticidade do domínio médico (priorização do Recall/Sensibilidade da classe Maligna).
+
+--------------------------------------------------------------------------------
+2. ESTRUTURA METODOLÓGICA (SEGUINDO OS 10 PASSOS DO PROF. FRANCISCO)
+--------------------------------------------------------------------------------
+Passo 1: Preparação e Limpeza dos Dados
+  - Inserção dos cabeçalhos corretos (a base bruta vem sem nomes de colunas).
+  - Remoção da coluna de ID (irrelevante para predição).
+  - Mapeamento da variável alvo ('B' -> 0, 'M' -> 1).
+  - Verificação de tipos, consistência e outliers físicos.
+
+Passo 2: Descrição Estatística Completa
+  - Medidas de tendência central (média, mediana).
+  - Medidas de dispersão (desvio padrão, variância, IQR).
+  - Medidas de forma (assimetria/skewness, curtose).
+  - Estatísticas estratificadas por classe (Maligno vs Benigno).
+
+Passo 3: Análise Exploratória e Reconhecimento de Padrões
+  - Matrizes de correlação (Pearson e Spearman) com heatmap.
+  - Pairplots das variáveis mais discriminantes (ex.: worst concave points, worst area).
+  - Boxplots comparativos entre Benigno e Maligno para cada família de features.
+  - Análise de densidade (KDE plots).
+
+Passo 4: Formulação e Enquadramento do Problema
+  - Problema principal: Classificação Supervisionada Binária (0 = Benigno, 1 = Maligno).
+  - Abordagem complementar: Não-supervisionada (Agrupamento / Clustering com K-Means 
+    e Mistura Gaussiana) para verificar a separabilidade intrínseca dos dados.
+
+Passo 5: Métodos de Aprendizado e Ajuste de Modelos
+  - Modelos a testar:
+      1. Regressão Logística (modelo linear baseline)
+      2. K-Nearest Neighbors - KNN (baseado em distância)
+      3. Support Vector Machine - SVM (com kernels Linear e RBF)
+      4. Naive Bayes Gaussiano (probabilístico)
+      5. Random Forest / Decision Tree (baseados em árvores e ensembles)
+  - Validação Cruzada Estratificada (Stratified K-Fold, k=5 ou k=10) para evitar vazamento.
+  - Ajuste de hiperparâmetros com GridSearchCV / RandomizedSearchCV.
+
+Passo 6: Comparação e Avaliação dos Modelos
+  - Métricas: Acurácia, Precisão, Recall (Sensibilidade), Especificidade, F1-Score e ROC-AUC.
+  - Matrizes de confusão normalizadas para cada modelo.
+  - Curvas ROC e curvas Precision-Recall comparativas.
+  - Análise de custo de erro médico (Falso Negativo custa muito mais que Falso Positivo).
+
+Passo 7: Otimização com Projeção, Seleção e Transformações
+  - Escalonamento: Comparar StandardScaler vs MinMaxScaler vs RobustScaler.
+  - Redução de dimensionalidade: PCA (Análise de Componentes Principais) e t-SNE.
+  - Seleção de atributos (Feature Selection):
+      * Remoção por alta colinearidade (VIF ou corte de correlação > 0.90).
+      * Seleção univariada (SelectKBest / ANOVA F-test).
+      * RFE (Recursive Feature Elimination) ou importâncias do Random Forest.
+  - Re-treinamento e comparação: o desempenho melhorou com menos variáveis?
+
+Passo 8: Resultados Finais Consolidados
+  - Tabela consolidada comparando todos os modelos (baseline vs dados reduzidos vs otimizados).
+  - Identificação do melhor classificador segundo as métricas clínicas.
+
+Passo 9: Discussão dos Resultados e Limitações
+  - Interpretação das features mais decisivas na classificação do tumor.
+  - Discussão sobre explicabilidade clínica vs complexidade do modelo.
+  - Análise crítica de desafios: tamanho da amostra (569 casos), generalização para 
+    novas populações e propostas de trabalhos futuros.
+
+Passo 10: Sumário Executivo e Síntese
+  - Resumo das descobertas, síntese visual dos gráficos principais e conclusão do projeto.
+
+--------------------------------------------------------------------------------
+3. DIVISÃO DAS TAREFAS ENTRE OS 5 INTEGRANTES DO GRUPO
+--------------------------------------------------------------------------------
+
+INTEGRANTE 1: Engenharia de Dados, Estruturação e Pré-processamento
+-----------------------------------------------------------------
+• Atribuições:
+  1. Carregamento correto do `wdbc.data` aplicando os nomes oficiais definidos no `wdbc.names`.
+  2. Limpeza inicial: descarte da coluna ID, validação de tipos de dados (`float64`, `int`),
+     e codificação da variável alvo (`diagnosis`: Benigno=0, Maligno=1).
+  3. Verificação formal de integridade dos dados (ausência de NaNs, duplicatas, valores nulos).
+  4. Implementação de pipelines de pré-processamento no scikit-learn:
+     - Padronização (StandardScaler, MinMaxScaler e RobustScaler).
+  5. Estruturação do repositório Git, ambiente virtual (`requirements.txt`), organização
+     de pastas (`data/`, `notebooks/`, `src/`) e modularização de scripts auxiliares.
+• Entregas:
+  - Script/função de carga e split estratificado (Train/Test: ex. 80/20) sem vazamento de dados.
+  - Pipeline limpo e pronto para os outros integrantes consumirem.
+
+
+INTEGRANTE 2: Estatística Descritiva, EDA e Padrões Relevantes
+------------------------------------------------------------
+• Atribuições:
+  1. Elaboração do relatório de estatística descritiva (médias, medianas, quartis, desvio
+     padrão, variância, skewness e kurtosis) para as 30 variáveis, geral e por classe.
+  2. Geração de gráficos de distribuição individual: histogramas com curvas KDE e boxplots
+     estratificados por diagnóstico para identificar separabilidade visual e outliers.
+  3. Construção do mapa de calor (heatmap) com matriz de correlação (Pearson e Spearman).
+  4. Identificação dos pares com altíssima correlação (> 0.90) e diagnóstico de multicolinearidade.
+  5. Criação de pairplots focados nos melhores atributos discriminantes (ex.: piores raios, 
+     piores pontos côncavos, texturas).
+• Entregas:
+  - Seção visualmente rica de Análise Exploratória (EDA) com gráficos formatados profissionalmente.
+  - Texto explicativo detalhando os principais padrões encontrados e quais atributos
+    mais diferenciam tumores benignos de malignos.
+
+
+INTEGRANTE 3: Redução de Dimensionalidade, Seleção de Features e Clustering
+--------------------------------------------------------------------------
+• Atribuições:
+  1. Estudo não-supervisionado: aplicação de K-Means e/ou Mistura de Gaussianas (GMM)
+     para avaliar se os dados se agrupam naturalmente em 2 clusters (benigno vs maligno)
+     sem os rótulos originais, medindo o Silhouette Score.
+  2. Aplicação de PCA (Principal Component Analysis):
+     - Gráfico de variância explicada acumulada (Scree Plot / curva de cotovelo de componentes).
+     - Projeção 2D e 3D das classes usando os primeiros componentes principais.
+  3. Projeção t-SNE para visualização não-linear da separabilidade dos dados.
+  4. Seleção de atributos (Feature Selection):
+     - Método por eliminação de colinearidade (limiar de corte de correlação).
+     - Método univariado (SelectKBest com f_classif ou mutual_info_classif).
+     - Método Wrapper / Embutido (RFE com Random Forest ou Regressão Logística L1/Lasso).
+• Entregas:
+  - Gráficos de PCA e t-SNE com separação clara das classes.
+  - Lista ranqueada dos atributos mais informativos e criação de datasets com dimensões
+    reduzidas (ex.: dataset original vs dataset PCA vs dataset com top-k features).
+
+
+INTEGRANTE 4: Modelagem Supervisionada, Validação Cruzada e Otimização
+---------------------------------------------------------------------
+• Atribuições:
+  1. Implementação dos modelos de classificação supervisionada em scikit-learn:
+     - Regressão Logística (com regularização L1/L2)
+     - K-Nearest Neighbors (KNN)
+     - Support Vector Machine (SVM - Linear e RBF)
+     - Naive Bayes Gaussiano
+     - Árvores de Decisão / Random Forest
+  2. Estruturação do protocolo rigoroso de validação:
+     - StratifiedKFold (k=5 ou k=10) para garantir representatividade das classes.
+  3. Otimização de hiperparâmetros via GridSearchCV / RandomizedSearchCV para cada modelo
+     (ex.: C e gamma no SVM; n_neighbors e metric no KNN; n_estimators e max_depth no Random Forest).
+  4. Teste comparativo da performance dos modelos em 3 cenários:
+     - Cenário A: Todas as 30 variáveis originais padronizadas.
+     - Cenário B: Dados transformados via PCA (ex.: mantendo 95% da variância).
+     - Cenário C: Apenas o subconjunto das features selecionadas (Top-K / RFE).
+• Entregas:
+  - Tabela com os melhores hiperparâmetros de cada classificador.
+  - Código reprodutível com os modelos treinados e ajustados.
+
+
+INTEGRANTE 5: Avaliação Crítica, Métricas Médicas, Síntese e Documentação
+------------------------------------------------------------------------
+• Atribuições:
+  1. Cálculo e consolidação de todas as métricas de desempenho no conjunto de teste:
+     - Acurácia, Precisão, Recall (Sensibilidade), Especificidade, F1-Score e ROC-AUC.
+  2. Geração das curvas ROC comparativas no mesmo gráfico e Curvas Precision-Recall.
+  3. Plotagem das Matrizes de Confusão detalhadas e normalizadas para cada modelo.
+  4. Discussão focada na relevância clínica:
+     - Por que o Falso Negativo (paciente com câncer diagnosticada como benigna) é 
+       inaceitável em diagnóstico médico e como calibrar o limiar de decisão (threshold tuning).
+  5. Elaboração do Sumário Final, introdução, conclusão, revisão do texto científico e 
+     formatação do Notebook Jupyter final (e geração do PDF de 1 página com o link do GitHub 
+     conforme exigido pelo edital da disciplina).
+• Entregas:
+  - Gráficos finais de comparação de modelos (Curvas ROC e Matrizes de Confusão).
+  - Texto completo de discussão, conclusão e resumo do projeto.
+  - Revisão geral e checklist de submissão do trabalho.
+
+--------------------------------------------------------------------------------
+4. CRONOGRAMA SUGERIDO DE EXECUÇÃO EM 4 FASES
+--------------------------------------------------------------------------------
+
+FASE 1: Fundação e Dados (Semana 1)
+  - Integrante 1 prepara o dataset, cabeçalhos, pipeline de split e normalização.
+  - Integrante 2 faz as primeiras estatísticas descritivas básicas.
+  - Sincronização: Todo o grupo passa a usar os mesmos dados de treino/teste limpos.
+
+FASE 2: Exploração Aprofundada e Pré-Processamento Avançado (Semana 2)
+  - Integrante 2 finaliza EDA, boxplots, pairplots e heatmaps de correlação.
+  - Integrante 3 implementa PCA, t-SNE, K-Means e os métodos de Feature Selection.
+  - Sincronização: O grupo define os subconjuntos de variáveis (original, PCA, selecionadas).
+
+FASE 3: Treinamento, Otimização e Métricas (Semana 3)
+  - Integrante 4 treina e otimiza os classificadores (GridSearchCV + StratifiedKFold).
+  - Integrante 5 extrai e analisa as métricas médicas (Recall, ROC-AUC, matrizes).
+  - Ajuste conjunto: Calibração de limiares para minimizar falsos negativos.
+
+FASE 4: Síntese, Discussão e Entrega (Semana 4)
+  - Integrante 5 redige a discussão, sumário e monta o notebook unificado.
+  - Todos os 5 integrantes revisam seus respectivos tópicos no notebook/código.
+  - Geração da página PDF com link do GitHub e envio final no e-Disciplinas (Moodle).
+
+--------------------------------------------------------------------------------
+5. CHECKLIST DOS ITENS OBRIGATÓRIOS DO PROF. FRANCISCO RODRIGUES
+--------------------------------------------------------------------------------
+[ ] Pergunta fundamental formulada e justificada.
+[ ] Preparação dos dados: remoção do ID, tratamento de atributos e variáveis alvo.
+[ ] Descrição estatística detalhada (tendência central, dispersão, assimetria).
+[ ] Identificação de padrões relevantes e multicolinearidade com gráficos caprichados.
+[ ] Enquadramento do problema (Classificação supervisionada + estudo de agrupamento).
+[ ] Ajuste e seleção de múltiplos modelos (KNN, SVM, Regressão Logística, Random Forest, etc.).
+[ ] Comparação com múltiplas métricas (Acurácia, F1, Recall, Curva ROC-AUC, Matriz de Confusão).
+[ ] Melhoria por transformação: Escalonamento, PCA e Seleção de Atributos (Feature Selection).
+[ ] Obtenção e tabulação clara dos resultados finais.
+[ ] Discussão crítica dos resultados, relevância médica dos erros e melhorias futuras.
+[ ] Sumário executivo cobrindo todo o projeto.
+[ ] Qualidade gráfica destacada (gráficos legíveis, informativos e bem formatados).
+[ ] Notebook Jupyter documentado e link do GitHub pronto.
+================================================================================
