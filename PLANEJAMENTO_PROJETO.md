@@ -4,10 +4,6 @@
 
 ---
 
-> [!WARNING]
-> **Atenção quanto ao tamanho do grupo:** As instruções oficiais do professor especificam: *"Grupo: No máximo 3 pessoas (pode ser menos)"*. Como vocês estão em 5 integrantes, certifiquem-se de alinhar com o professor/monitor se há autorização para grupos de 5 ou se haverá necessidade de divisão formal na entrega. A divisão abaixo contempla perfeitamente os 5 integrantes de forma equilibrada.
-
----
 
 ## 1. Visão Geral da Base de Dados Real
 - **Arquivos presentes:** `data/raw/wdbc.data` e `data/raw/wdbc.names`
